@@ -1,89 +1,23 @@
 # linux fedora dns-http-dhcp-......-package-downlaod-commandes-
-Configuration de base et DNS sous Linux Fedora
-1. Configuration du réseau
-Modifier les fichiers de configuration du réseau :
+Configuration DNS sous Linux Fedora
+Introduction
+Ce projet décrit la mise en place d’un serveur DNS sur Linux Fedora en utilisant Bind. Il inclut la configuration du réseau, l’installation des paquets nécessaires et la configuration des zones DNS, aussi bien directes qu’inverses.
 
+Configuration du Réseau
+La configuration réseau commence par la définition du nom d’hôte et des paramètres IP. L’interface réseau est paramétrée avec une adresse IP statique, un masque de sous-réseau, une passerelle et des serveurs DNS publics.
 
-vi /etc/sysconfig/network
-Ajouter le nom d’hôte :
+Installation de Bind
+L’installation du service DNS se fait en vérifiant d’abord sa présence dans le système. Si nécessaire, Bind est installé depuis les paquets RPM. Une fois installé, il peut être configuré pour gérer les zones DNS.
 
+Configuration des Zones DNS
+Deux types de zones sont définis :
 
-hostname=baitam
-Configurer l’interface réseau :
+La zone directe, qui associe des noms de domaine à des adresses IP.
+La zone inverse, qui permet la résolution inverse, en associant des adresses IP à des noms de domaine.
+Les fichiers de configuration contiennent les informations sur le serveur DNS, les enregistrements SOA (Start of Authority), les serveurs de noms (NS) et les correspondances entre noms et adresses IP.
 
+Redémarrage et Test du Serveur DNS
+Après la configuration, le service Bind est redémarré pour appliquer les modifications. La résolution DNS peut être testée en interrogeant le serveur avec des outils comme nslookup ou dig.
 
-vi /etc/sysconfig/network-scripts/ifcfg-eth0
-Exemple de configuration :
-
-
-ONBOOT=YES
-IPADDR=192.168.10.10
-NETMASK=255.255.255.0
-GATEWAY=192.168.10.11
-DNS1=8.8.8.8
-DNS2=8.8.4.4
-2. Installation de Bind
-Vérifier si Bind est installé :
-
-
-rpm -qa | grep bind
-Si ce n’est pas le cas, installer Bind :
-
-
-rpm -ivh bind-****
-3. Configuration du serveur DNS
-Modifier le fichier de configuration principal
-
-
-vi /etc/named.conf
-Définir les zones DNS :
-
-
-zone "formation.ma" IN {
-    type master;
-    file "formation.dir";
-};
-
-zone "5.168.192.in-addr.arpa" IN {
-    type master;
-    file "formation.inv";
-};
-Configurer la zone directe
-
-
-vi /var/named/formation.dir
-Exemple de configuration :
-
-
-$TTL 86400
-@   IN  SOA server.formation.ma. root.formation.ma. (
-        01 ; Serial
-        10800 ; Refresh
-        3600  ; Retry
-        604800 ; Expire
-        38400 ; Minimum
-)
-@   IN  NS  server.formation.ma.
-Server  IN  A   192.168.5.2
-Configurer la zone inverse
-
-
-vi /var/named/formation.inv
-Exemple de configuration :
-
-
-
-$TTL 86400
-@   IN  SOA server.formation.ma. root.formation.ma. (
-        01 ; Serial
-        10800 ; Refresh
-        3600  ; Retry
-        604800 ; Expire
-        38400 ; Minimum
-)
-@   IN  NS  server.formation.ma.
-2   IN  PTR server.formation.ma.
-4. Redémarrer le service Bind
-
-
-service named restart
+Conclusion
+Cette configuration permet d’héberger un serveur DNS fonctionnel sous Linux Fedora, facilitant la gestion des noms de domaine au sein d’un réseau local ou d’une infrastructure plus large
